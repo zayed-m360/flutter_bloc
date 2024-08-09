@@ -27,8 +27,7 @@ class _HomeUiState extends State<HomeUi> {
     return BlocConsumer<HomeBloc, HomeState>(
       bloc: homeBloc,
       listenWhen: (previous, current) => current is HomeActionState,
-      buildWhen: (previous, current) =>
-          current is! HomeActionState || current is HomeUpdateBadgeState,
+      buildWhen: (previous, current) => current is! HomeActionState,
       listener: (context, state) {
         if (state is HomeNavigateToFavoritesState) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => FavoritesUi()));

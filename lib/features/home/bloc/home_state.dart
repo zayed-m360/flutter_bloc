@@ -20,7 +20,7 @@ class HomeLoadingSuccessState extends HomeState {
   });
 }
 
-class HomeUpdateBadgeState extends HomeActionState {
+class HomeUpdateBadgeState extends HomeState {
   final int cartItemCount;
   final int favoriteItemCount;
 
