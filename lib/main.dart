@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myapp/features/cart/bloc/cart_bloc.dart';
-import 'package:myapp/features/favourites/bloc/favourites_bloc.dart';
 import 'package:myapp/features/home/bloc/home_bloc.dart';
 
 import 'features/home/ui/home_ui.dart';
@@ -15,12 +13,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<CartBloc>(
-          create: (context) => CartBloc(),
-        ),
-        BlocProvider<FavouritesBloc>(
-          create: (context) => FavouritesBloc(),
-        ),
         BlocProvider<HomeBloc>(
           create: (context) => HomeBloc(),
         ),

@@ -1,9 +1,6 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:myapp/data/cart_list.dart';
-import 'package:myapp/data/favorite_list.dart';
 import 'package:myapp/features/home/model/product_data_model.dart';
 
 import '../../../data/product_list.dart';
@@ -12,18 +9,26 @@ part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+
+  List<ProductDataModel> allProducts = [];
+  List<ProductDataModel> cartList = [];
+  List<ProductDataModel> favoriteList = [];
+
   HomeBloc() : super(HomeInitial()) {
     on<HomeInitialEvent>(homeInitialEvent);
     on<HomeNavigateFavoritesEvent>(homeNavigateFavoritesEvent);
     on<HomeNavigateCartEvent>(homeNavigateCartEvent);
     on<HomeClickCartEvent>(homeClickCartEvent);
+    on<HomeUnClickCartEvent>(homeUnClickCartEvent);
     on<HomeClickFavoritesEvent>(homeClickFavoritesEvent);
+    on<HomeUnClickFavoritesEvent>(homeUnClickFavoritesEvent);
   }
 
   FutureOr<void> homeInitialEvent(HomeInitialEvent event, Emitter<HomeState> emit) async{
     emit(HomeLoadingState());
     await Future.delayed(Duration(seconds: 2));
-    emit(HomeLoadingSuccessState(product: TechProducts.techProducts.map((product)=>ProductDataModel(id: product['id'], name: product['name'], imageUrl: product['imageUrl'], price: product['price'])).toList()));
+    allProducts = TechProducts.techProducts.map((product)=>ProductDataModel(id: product['id'], name: product['name'], imageUrl: product['imageUrl'], price: product['price'])).toList();
+    emit(HomeLoadingSuccessState(product: allProducts, cartItemCount: 0, favoriteItemCount: 0));
   }
 
   FutureOr<void> homeNavigateFavoritesEvent(HomeNavigateFavoritesEvent event, Emitter<HomeState> emit) {
@@ -37,15 +42,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   FutureOr<void> homeClickCartEvent(HomeClickCartEvent event, Emitter<HomeState> emit) {
-    print("Clicked cart");
     cartList.add(event.productDataModel);
-    emit(HomeClickCartState());
+    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+  }
+
+  FutureOr<void> homeUnClickCartEvent(HomeUnClickCartEvent event, Emitter<HomeState> emit) {
+    cartList.remove(event.productDataModel);
+    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
   }
 
   FutureOr<void> homeClickFavoritesEvent(HomeClickFavoritesEvent event, Emitter<HomeState> emit) {
-    print("Clicked Favorites");
     favoriteList.add(event.productDataModel);
-    emit(HomeClickFavoritesState());
+    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
   }
 
+  FutureOr<void> homeUnClickFavoritesEvent(HomeUnClickFavoritesEvent event, Emitter<HomeState> emit) {
+    favoriteList.remove(event.productDataModel);
+    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+  }
 }

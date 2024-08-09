@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myapp/features/cart/bloc/cart_bloc.dart';
 import 'package:myapp/features/home/model/product_data_model.dart';
 
-import '../../favourites/bloc/favourites_bloc.dart';
 import '../bloc/home_bloc.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final ProductDataModel productDataModel;
   const ProductCard({super.key, required this.productDataModel});
 
   @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  late HomeBloc homeBloc;
+  @override
+  void initState() {
+    homeBloc = BlocProvider.of<HomeBloc>(context);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final homeBloc = BlocProvider.of<HomeBloc>(context);
     return Container(
       margin: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
@@ -45,7 +54,7 @@ class ProductCard extends StatelessWidget {
                 child: RotatedBox(
                   quarterTurns: 3,
                   child: Text(
-                    productDataModel.name.toUpperCase(),
+                    widget.productDataModel.name.toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -57,7 +66,7 @@ class ProductCard extends StatelessWidget {
               SizedBox(width: 8),
               Expanded(
                 child: Image.network(
-                  productDataModel.imageUrl,
+                  widget.productDataModel.imageUrl,
                   fit: BoxFit.contain,
                   height: 100,
                 ),
@@ -74,7 +83,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '\$${(productDataModel.price+50).toStringAsFixed(2)}', 
+                      '\$${(widget.productDataModel.price + 50).toStringAsFixed(2)}',
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: 16,
@@ -83,7 +92,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     // New price
                     Text(
-                      '\$${productDataModel.price.toStringAsFixed(2)}',
+                      '\$${widget.productDataModel.price.toStringAsFixed(2)}',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -93,41 +102,48 @@ class ProductCard extends StatelessWidget {
                   ],
                 ),
                 // Icons for favorite and cart
-                Row(
-                  children: [
-                    BlocBuilder<FavouritesBloc, FavouritesState>(
-                      builder: (context, state) {
-                        bool isFavorited = false;
-                        if (state is FavouritesSucessState) {
-                          isFavorited = state.favouritesItems.contains(productDataModel);
-                        }
-                        return IconButton(
+                BlocBuilder<HomeBloc, HomeState>(
+                  bloc: homeBloc,
+                  builder: (context, state) {
+                    bool isCarted = homeBloc.cartList
+                        .contains(widget.productDataModel);
+                    bool isFavorited = homeBloc.favoriteList
+                        .contains(widget.productDataModel);
+                    return Row(
+                      children: [
+                        IconButton(
                           icon: Icon(
-                            isFavorited ? Icons.favorite : Icons.favorite_border,
+                            isFavorited
+                                ? Icons.favorite
+                                : Icons.favorite_outline_outlined,
                           ),
                           onPressed: () {
-                            homeBloc.add(HomeClickFavoritesEvent(productDataModel: productDataModel));
+                            isFavorited
+                                ? homeBloc.add(HomeUnClickFavoritesEvent(
+                                    productDataModel: widget.productDataModel))
+                                :
+                            homeBloc.add(HomeClickFavoritesEvent(
+                                productDataModel: widget.productDataModel));
                           },
-                        );
-                      },
-                    ),
-                    BlocBuilder<CartBloc, CartState>(
-                      builder: (context, state) {
-                        bool isInCart = false;
-                        if (state is CartSuccessState) {
-                          isInCart = state.cartItems.contains(productDataModel);
-                        }
-                        return IconButton(
+                        ),
+                        IconButton(
                           icon: Icon(
-                            isInCart ? Icons.shopping_cart : Icons.shopping_cart_outlined,
+                            isCarted
+                                ? Icons.shopping_bag
+                                : Icons.shopping_bag_outlined,
                           ),
                           onPressed: () {
-                            homeBloc.add(HomeClickCartEvent(productDataModel: productDataModel));
+                            isCarted
+                                ? homeBloc.add(HomeUnClickCartEvent(
+                                    productDataModel: widget.productDataModel))
+                                :
+                            homeBloc.add(HomeClickCartEvent(
+                                productDataModel: widget.productDataModel));
                           },
-                        );
-                      },
-                    ),
-                  ],
+                        )
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
