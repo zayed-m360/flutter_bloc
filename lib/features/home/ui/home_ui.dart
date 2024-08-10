@@ -49,13 +49,14 @@ class _HomeUiState extends State<HomeUi> {
         int cartItemCount = homeBloc.cartList.length;
         int favoriteItemCount = homeBloc.favoriteList.length;
 
-        if (state is HomeLoadingSuccessState) {
-          cartItemCount = state.cartItemCount;
-          favoriteItemCount = state.favoriteItemCount;
-        } else if (state is HomeUpdateBadgeState) {
-          cartItemCount = state.cartItemCount;
-          favoriteItemCount = state.favoriteItemCount;
-        }
+        cartItemCount = homeBloc.cartItemCount;
+        favoriteItemCount = homeBloc.favoriteItemCount;
+
+        // if (state is HomeLoadingSuccessState) {
+        // } else if (state is HomeUpdateBadgeState) {
+        //   cartItemCount = homeBloc.cartItemCount;
+        //   favoriteItemCount = homeBloc.favoriteItemCount;
+        // }
 
         return Scaffold(
           appBar: AppBar(

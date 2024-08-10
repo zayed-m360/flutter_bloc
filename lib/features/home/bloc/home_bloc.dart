@@ -13,6 +13,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<ProductDataModel> allProducts = [];
   List<ProductDataModel> cartList = [];
   List<ProductDataModel> favoriteList = [];
+  int cartItemCount = 0;
+  int favoriteItemCount = 0;
 
   HomeBloc() : super(HomeInitial()) {
     on<HomeInitialEvent>(homeInitialEvent);
@@ -28,7 +30,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeLoadingState());
     await Future.delayed(Duration(seconds: 2));
     allProducts = TechProducts.techProducts.map((product)=>ProductDataModel(id: product['id'], name: product['name'], imageUrl: product['imageUrl'], price: product['price'])).toList();
-    emit(HomeLoadingSuccessState(product: allProducts, cartItemCount: 0, favoriteItemCount: 0));
+    // emit(HomeLoadingSuccessState(product: allProducts, cartItemCount: 0, favoriteItemCount: 0));
+    emit(HomeLoadingSuccessState());
   }
 
   FutureOr<void> homeNavigateFavoritesEvent(HomeNavigateFavoritesEvent event, Emitter<HomeState> emit) {
@@ -43,21 +46,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   FutureOr<void> homeClickCartEvent(HomeClickCartEvent event, Emitter<HomeState> emit) {
     cartList.add(event.productDataModel);
-    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+    cartItemCount ++;
+    emit(HomeUpdateBadgeState());
   }
 
   FutureOr<void> homeUnClickCartEvent(HomeUnClickCartEvent event, Emitter<HomeState> emit) {
     cartList.remove(event.productDataModel);
-    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+    cartItemCount --;
+    emit(HomeUpdateBadgeState());
+    // emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
   }
 
   FutureOr<void> homeClickFavoritesEvent(HomeClickFavoritesEvent event, Emitter<HomeState> emit) {
     favoriteList.add(event.productDataModel);
-    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+    favoriteItemCount ++;
+    emit(HomeUpdateBadgeState());
+    // emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
   }
 
   FutureOr<void> homeUnClickFavoritesEvent(HomeUnClickFavoritesEvent event, Emitter<HomeState> emit) {
     favoriteList.remove(event.productDataModel);
-    emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
+    favoriteItemCount --;
+    emit(HomeUpdateBadgeState());
+    // emit(HomeUpdateBadgeState(cartItemCount: cartList.length, favoriteItemCount: favoriteList.length));
   }
 }
